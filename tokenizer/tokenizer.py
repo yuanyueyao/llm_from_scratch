@@ -4,7 +4,7 @@ from typing import Dict, List, Tuple, Set, Optional, Iterable, Iterator
 import os
 import json
 from tqdm import tqdm
-from common import gpt2_bytes_to_unicode
+from utils.common import gpt2_bytes_to_unicode
 class Tokenizer:
     """
     Construct a BPE Tokenizer from scratch.
