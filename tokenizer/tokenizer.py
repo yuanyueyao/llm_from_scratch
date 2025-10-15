@@ -4,7 +4,8 @@ from typing import Dict, List, Tuple, Set, Optional, Iterable, Iterator
 import os
 import json
 from tqdm import tqdm
-from tests.common import gpt2_bytes_to_unicode
+import time
+from utils.common import gpt2_bytes_to_unicode
 class Tokenizer:
     """
     Construct a BPE Tokenizer from scratch.
@@ -19,10 +20,9 @@ class Tokenizer:
         Construct a tokenizer from a given
         vocabulary, list of merges, and (optionally) a list of special tokens
         """
-        if vocab is not None and merges is not None:    
-            self.vocab = vocab
-            self.merges = merges
-            self.special_tokens = {token: token.encode('utf-8') for token in special_tokens} if special_tokens else {}
+        self.vocab = vocab if vocab else {}
+        self.merges = merges if merges else []
+        self.special_tokens = {token: token.encode('utf-8') for token in special_tokens} if special_tokens else {}
         
         self.next_token_id = max(vocab.keys()) + 1 if vocab else 0
         self.pat = re.compile(r"""'(?:[sdmt]|ll|ve|re)| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+""")
