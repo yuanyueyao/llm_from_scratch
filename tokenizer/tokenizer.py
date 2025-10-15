@@ -4,25 +4,26 @@ from typing import Dict, List, Tuple, Set, Optional, Iterable, Iterator
 import os
 import json
 from tqdm import tqdm
-from utils.common import gpt2_bytes_to_unicode
+from tests.common import gpt2_bytes_to_unicode
 class Tokenizer:
     """
     Construct a BPE Tokenizer from scratch.
     """
     vocab: Dict[int, bytes]
     merges: list[tuple[bytes, bytes]]
-    special_tokens: Dict[str, bytes]
+    special_tokens: Dict[str, bytes]  #  实例变量类型注释在这里
     next_token_id: int
     pat: re.Pattern[str]
-    def __init__(self, vocab: Dict[int, bytes], merges: List[Tuple[bytes, bytes]], special_tokens: List[str] | None = None):
+    def __init__(self, vocab: Dict[int, bytes] | None, merges: List[Tuple[bytes, bytes]] | None, special_tokens: List[str] | None = None):
         """
         Construct a tokenizer from a given
         vocabulary, list of merges, and (optionally) a list of special tokens
         """
+        if vocab is not None and merges is not None:    
+            self.vocab = vocab
+            self.merges = merges
+            self.special_tokens = {token: token.encode('utf-8') for token in special_tokens} if special_tokens else {}
         
-        self.vocab = vocab
-        self.merges = merges
-        self.special_tokens = {token: token.encode('utf-8') for token in special_tokens} if special_tokens else {}
         self.next_token_id = max(vocab.keys()) + 1 if vocab else 0
         self.pat = re.compile(r"""'(?:[sdmt]|ll|ve|re)| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+""")
 
@@ -262,15 +263,33 @@ class Tokenizer:
         
         return self.vocab, self.merges
     
+    
+
+
     def save(self, vocab_path: str | os.PathLike, merges_path: str | os.PathLike):
         """
         Save the vocabulary and merges to files
         But json can't save bytes, this is a problem
+        vocab_path: path to save vocabulary (JSON format)
+        merges_path: path to save merges (text format)
         """
-        pass
+        gpt2_int_str_encoder:dict[int, str] = gpt2_bytes_to_unicode()
+        vocab_serialized: dict[str, int] = { "".join([gpt2_int_str_encoder[byte] for byte in v]): k for k, v in self.vocab.items()}
+        
+        merges_serialized: list[Tuple[str, str]] = [
+            ("".join([gpt2_int_str_encoder[byte] for byte in a]), "".join([gpt2_int_str_encoder[byte] for byte in b]))
+            for a, b in self.merges
+        ]
+        # open file 
+        with open(os.fspath(vocab_path), 'w', encoding='utf-8') as vocab_f:
+            json.dump(vocab_serialized, vocab_f, ensure_ascii=False, indent=2)
+        with open(os.fspath(merges_path), 'w', encoding='utf-8') as merges_f:
+            for a, b in merges_serialized:
+                merges_f.write(f"{a} {b}\n")
+
     def from_pretrained(self):
         """
-        Load a pretrained BPE tokenizer from vocab and merges
+        Implemented in from_files. Use that method instead.
         """
         pass
 
@@ -399,9 +418,3 @@ class Tokenizer:
             return result_bytes.decode('utf-8', errors='replace')
         except:
             return result_bytes.decode('utf-8', errors='ignore')
-        
-
-import time, psutil, os
-
-if __name__ == "__main__":
-    pass
