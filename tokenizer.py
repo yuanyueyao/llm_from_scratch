@@ -11,7 +11,7 @@ class Tokenizer:
     """
     vocab: Dict[int, bytes]
     merges: list[tuple[bytes, bytes]]
-    special_tokens: Dict[str, bytes]  #  实例变量类型注释在这里
+    special_tokens: Dict[str, bytes]
     next_token_id: int
     pat: re.Pattern[str]
     def __init__(self, vocab: Dict[int, bytes], merges: List[Tuple[bytes, bytes]], special_tokens: List[str] | None = None):
