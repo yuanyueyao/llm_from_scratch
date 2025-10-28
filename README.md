@@ -11,7 +11,11 @@ Build a Large Language Model (LLM) completely from scratch! 😄
   - [x] Encode and decode text  
   - [x] Validate the tokenizer  
 
-### ⚙️ Model
-- [ ] Implement a Transformer model  
+### ⚙️ Model architecture
+- [x] Implement a Transformer model  
+
+### Train
 - [ ] Train the model on a dataset  
+
+### test
 - [ ] Evaluate the model's performance
