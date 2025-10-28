@@ -12,10 +12,18 @@ Build a Large Language Model (LLM) completely from scratch! 😄
   - [x] Validate the tokenizer  
 
 ### Model architecture
-- [x] Implement a Transformer model  
+- [x] Build a Transformer model  
+  - [x] Implement the soft_max
+  - [x] Implement the attention mechanism  
+  - [x] Implement the feed-forward network  
+  - [x] Implement positional encoding  
+  - [x] Implement layer normalization  
 
 ### Train
-- [ ] Train the model on a dataset  
+- [ ] Train the model on a dataset 
+  - [x] Implement the cross_entropy loss function
+  - [] Implement the Adam optimizer
+  - [] 
 
-### test
+### Test
 - [ ] Evaluate the model's performance
