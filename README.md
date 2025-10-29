@@ -22,8 +22,9 @@ Build a Large Language Model (LLM) completely from scratch! 😄
 ### Train
 - [ ] Train the model on a dataset 
   - [x] Implement the cross_entropy loss function
-  - [] Implement the Adam optimizer
-  - [] 
+  - [x] Implement the Adam optimizer
+  - [] Set up the training loop
+  - [] Monitor training progress
 
 ### Test
 - [ ] Evaluate the model's performance
