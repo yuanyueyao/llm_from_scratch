@@ -2,6 +2,22 @@
 
 Build a Large Language Model (LLM) completely from scratch! 😄
 
+
+## Quick Start
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yuanyueyao/llm_from_scratch
+    cd llm_from_scratch
+    ```
+2. Install the required dependencies:
+    ```bash
+    pip install -r requirements.txt
+    ```
+3. Look at the scripts folder and run your desired script. For example, to train the model:
+    ```bash
+    python scripts/train.py
+    ```
+    
 ## ✅ Todo
 
 ### Tokenizer
@@ -28,3 +44,5 @@ Build a Large Language Model (LLM) completely from scratch! 😄
 
 ### Test
 - [ ] Evaluate the model's performance
+
+
