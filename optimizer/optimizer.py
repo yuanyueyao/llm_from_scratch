@@ -51,7 +51,7 @@ class AdamW(Optimizer):
                 if 'm' not in state:
                     state['m'] = torch.zeros_like(p.data)
                     state['v'] = torch.zeros_like(p.data)
-                    state['t'] = 0
+                    state['t'] = 0      #感觉这个t没必要每个参数存一个，可以放在param_group里，甚至是单个标量即可
     
                 m, v, t = state['m'], state['v'], state['t']
                 t += 1
@@ -100,3 +100,20 @@ def gradient_clipping(parameters: Iterable[torch.nn.Parameter], max_l2_norm: flo
         for p in parameters:
             if p.grad is not None:
                 p.grad.data *= clip_coef
+
+
+def save_checkpoint(model: torch.nn.Module, optimizer: torch.optim.Optimizer, iteration: int, out):
+    checkpoint = {
+        'model_state_dict': model.state_dict(),
+        'optimizer_state_dict': optimizer.state_dict(),
+        'iteration': iteration,
+    }
+    torch.save(checkpoint, out)
+
+def load_checkpoint(src, model: torch.nn.Module, optimizer: torch.optim.Optimizer):
+    checkpoint = torch.load(src)
+    model.load_state_dict(checkpoint['model_state_dict'])
+    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+    iteration = checkpoint['iteration']
+    return iteration
+    

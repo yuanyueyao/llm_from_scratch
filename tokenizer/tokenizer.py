@@ -4,7 +4,6 @@ from typing import Dict, List, Tuple, Set, Optional, Iterable, Iterator
 import os
 import json
 from tqdm import tqdm
-import time
 from utils.common import gpt2_bytes_to_unicode
 class Tokenizer:
     """
@@ -20,9 +19,10 @@ class Tokenizer:
         Construct a tokenizer from a given
         vocabulary, list of merges, and (optionally) a list of special tokens
         """
-        self.vocab = vocab if vocab else {}
-        self.merges = merges if merges else []
-        self.special_tokens = {token: token.encode('utf-8') for token in special_tokens} if special_tokens else {}
+        if vocab is not None and merges is not None:    
+            self.vocab = vocab
+            self.merges = merges
+            self.special_tokens = {token: token.encode('utf-8') for token in special_tokens} if special_tokens else {}
         
         self.next_token_id = max(vocab.keys()) + 1 if vocab else 0
         self.pat = re.compile(r"""'(?:[sdmt]|ll|ve|re)| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+""")
@@ -105,7 +105,8 @@ class Tokenizer:
     
     def _words_to_byte_tuples(self, pre_tokens: List[str]) -> Dict[Tuple[bytes, ...], int]:
         """
-        Convert pre-tokens to byte tuples and count frequencies
+        Convert pre-tokens (list[str]） to byte tuples and count frequencies.
+        return dicrt[byte_tuple, frequency]
         """
         word_freq = Counter()
         
@@ -197,6 +198,7 @@ class Tokenizer:
         # Remove special tokens from training data and split into documents
         start_time = time.time()
         documents:list[str] = self._split_by_special_tokens(text, special_tokens)
+        documents = [doc for doc in documents if doc not in special_tokens]
         # print("documents[:9},",documents[:8])
         end_time = time.time()
         print(f"Removed special tokens and split into {len(documents)} documents in {end_time - start_time:.2f} seconds")
@@ -305,12 +307,11 @@ class Tokenizer:
         # Escape special tokens for regex
         escaped_tokens = [re.escape(token) for token in sorted(special_tokens, reverse=True)]
         pattern = "|".join(escaped_tokens)
-        
         # Split on special tokens
         parts = re.split(f"({pattern})", text)
-        # Return only the non-special token parts (documents)
+
+        # Return
         documents_or_special_token = []
-        special_tokens_found = []
         for i, part in enumerate(parts):
             documents_or_special_token.append(part)
 
@@ -339,8 +340,10 @@ class Tokenizer:
                     if vocab_token == special_token_bytes:
                         token_id = tid
                         break
-                if token_id is not None:
-                    all_token_ids.append(token_id)
+                # if found in vocab, add to list
+                assert token_id is not None, f"Special token {doc_or_special_token} not found in vocabulary"
+                
+                all_token_ids.append(token_id)
                 continue
             
             # Not a special token, pre-tokenize normally
@@ -350,8 +353,8 @@ class Tokenizer:
                 # Convert pre-token to bytes
                 byte_sequence = pre_token.encode('utf-8')
                 current_tokens = [bytes([b]) for b in byte_sequence]
-                
-                # Apply BPE merges
+
+                # Apply BPE merges, each iteration updates current_tokens list with corresponding merges
                 for merge in self.merges:
                     new_tokens = []
                     i = 0
@@ -389,7 +392,7 @@ class Tokenizer:
 
         return all_token_ids
     
-    def encode_iterable(self, iterable: Iterable[str]) -> Iterator[int]:
+    def encode_iterable(self, iterable: Iterable[str]) -> Iterator[List[int]]:
         """
         Given an iterable of strings (e.g., a Python file handle), return a generator that lazily yields token IDs. 
         This is required for memory-eﬀicient tokenization of large files that we cannot directly load into memory.
@@ -402,8 +405,7 @@ class Tokenizer:
         """
         for line in iterable:
             token_ids = self.encode(line)
-            for token_id in token_ids:
-                yield token_id
+            yield token_ids
         
         
     def decode(self, token_ids: List[int]) -> str:
@@ -418,3 +420,9 @@ class Tokenizer:
             return result_bytes.decode('utf-8', errors='replace')
         except:
             return result_bytes.decode('utf-8', errors='ignore')
+        
+
+import time, psutil, os
+
+if __name__ == "__main__":
+    pass
