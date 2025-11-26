@@ -46,7 +46,7 @@ def main(cfg: DictConfig):
     lm: Transformer_lm = Transformer_lm(**model_cfg)
     checkpoint = torch.load(training_cfg.checkpoint_path+".step700.pt", weights_only=False)
     lm.load_state_dict(checkpoint['model_state_dict'])
-    tokenizer = Tokenizer.from_files("data/gpt2_vocab.json", "data/gpt2_merges.txt", special_tokens=["<|endoftext|>"])
+    tokenizer = Tokenizer.from_files("data/TinyStories-train_vocab.json", "data/TinyStories-train_merges.txt", special_tokens=["<|endoftext|>"])
     input_ids = torch.tensor([tokenizer.encode("Once upon a time")], device=data_cfg.device)
     print(input_ids.shape)
     out_ids = lm.generate(input_ids, max_new_tokens=300, eos_token_id=50256)

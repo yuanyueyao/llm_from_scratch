@@ -8,7 +8,7 @@ import numpy as np
 import time
 
 tokenizer = Tokenizer.from_files(
-    vocab_path="data/TinyStories—train_vocab.json", merges_path="data/TinyStories-train_merges.txt", special_tokens=["<|endoftext|>"]
+    vocab_path="data/TinyStories-train_vocab.json", merges_path="data/TinyStories-train_merges.txt", special_tokens=["<|endoftext|>"]
 )
 
 start_time = time.time()
