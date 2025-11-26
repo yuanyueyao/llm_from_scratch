@@ -1,7 +1,6 @@
 #
 data/owt_train.txt
 data/trash/
-data
 # Virtual Environment
 .venv/
 venv/
