@@ -19,10 +19,10 @@ class Tokenizer:
         Construct a tokenizer from a given
         vocabulary, list of merges, and (optionally) a list of special tokens
         """
-        if vocab is not None and merges is not None:    
-            self.vocab = vocab
-            self.merges = merges
-            self.special_tokens = {token: token.encode('utf-8') for token in special_tokens} if special_tokens else {}
+        
+        self.vocab = vocab if vocab is not None else {}
+        self.merges = merges if merges is not None else []
+        self.special_tokens = {token: token.encode('utf-8') for token in special_tokens} if special_tokens else {}
         
         self.next_token_id = max(vocab.keys()) + 1 if vocab else 0
         self.pat = re.compile(r"""'(?:[sdmt]|ll|ve|re)| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+""")
@@ -39,7 +39,7 @@ class Tokenizer:
         (in the same format that your BPE training code output) from the given paths
         and returns them as a tuple (vocab, merges).
         """
-        gpt2_byte_decoder: dict[str, int] = {v: k for k, v in gpt2_bytes_to_unicode().items()}
+        gpt2_byte_decoder: dict[str, int] = {v: k for k, v in gpt2_bytes_to_unicode().items()} 
         with open(vocab_path) as vocab_f:
             gpt2_vocab: dict[str, int] = json.load(vocab_f)
         gpt2_bpe_merges: list[tuple[str, str]] = []
@@ -52,7 +52,7 @@ class Tokenizer:
         # The GPT-2 tokenizer uses a remapped unicode encoding for bytes. Let's
         # just return the original bytes, so we don't force students to use
         # any particular encoding scheme.
-        vocab = {
+        vocab: Dict[int, bytes] = {
             gpt2_vocab_index: bytes([gpt2_byte_decoder[token] for token in gpt2_vocab_item])
             for gpt2_vocab_item, gpt2_vocab_index in gpt2_vocab.items()
         }

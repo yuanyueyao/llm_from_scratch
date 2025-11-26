@@ -60,16 +60,17 @@ def get_batch(
 
 
 if __name__ == "__main__":
-    token_ids = np.memmap("data/TinyStories_yyy_small_tokens.bin", dtype=np.int32, mode="r")
+    token_ids = np.memmap("data/TinyStories_sample.bin", dtype=np.int32, mode="r")
 
     # 统计token_ids的一些基本信息
     print(f"Token IDs shape: {token_ids.shape}")
-    print(f"First 10 Token IDs: {token_ids[:10]}")
+    print(f"First 10 Token IDs: {token_ids[:200]}")
 
-    batch = get_batch(token_ids, batch_size=4, context_length=28, device="cpu")
+    batch = get_batch(token_ids, batch_size=4, context_length=50, device="cpu")
 
     tokenizer = Tokenizer.from_files(
-        vocab_path="data/gpt2_vocab.json", merges_path="data/gpt2_merges.txt"
+        vocab_path="data/TinyStories-train_vocab.json", merges_path="data/TinyStories-train_merges.txt", special_tokens=["<|endoftext|>"]
     )
-
+    print("Sample token IDs from batch:")
+    print(batch[0][0])
     print(tokenizer.decode(batch[0][0].tolist()))
