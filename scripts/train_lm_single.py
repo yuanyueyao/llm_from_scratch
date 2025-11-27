@@ -24,7 +24,7 @@ import wandb
 
 from tqdm import tqdm
 
-@hydra.main(config_path="configs/", config_name="train_lm_single", version_base=None)
+@hydra.main(config_path="configs/", config_name="train_lm", version_base=None)
 def main(cfg: DictConfig):
     model_cfg: DictConfig = cfg.model
     optimizer_cfg: DictConfig = cfg.optimizer
