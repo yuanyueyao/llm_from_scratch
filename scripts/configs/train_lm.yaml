@@ -17,7 +17,7 @@ optimizer:
 
 # 数据参数：适配TinyStories数据集，兼顾训练效率
 data:
-  data_path: "data/TinyStories.bin"    # 完整TinyStories数据集路径（非sample）
+  data_path: "data/TinyStoriesV2-GPT4-train.bin"    # 完整TinyStories数据集路径（非sample）
   batch_size: 64                      # 单卡H100的合理批次，作业要求做batch_size实验
   context_length: 256                 # 与模型的context_length保持一致
   device: "cuda"                      # 作业实验基于H100 GPU，优先用cuda
