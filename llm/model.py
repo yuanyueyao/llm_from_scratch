@@ -186,7 +186,7 @@ class mutihead_self_attention(nn.Module):
         K = rearrange(K, "... sequence_length (num_heads d_k) -> ... num_heads sequence_length d_k", num_heads=self.num_heads)
         V = rearrange(V, "... sequence_length (num_heads d_v) -> ... num_heads sequence_length d_v", num_heads=self.num_heads)
 
-        mask = torch.tril(torch.ones(Q.shape[-2], K.shape[-2]), diagonal=0).bool()
+        mask = torch.tril(torch.ones(Q.shape[-2], K.shape[-2], device=Q.device), diagonal=0).bool()
 
         # sqpa & o_projection
         out = sdpa(Q, K, V, mask=mask)
@@ -222,7 +222,7 @@ class mhsa_rope(nn.Module):
         Q = self.rope(Q, token_positions)
         K = self.rope(K, token_positions)
 
-        mask = torch.tril(torch.ones(Q.shape[-2], K.shape[-2]), diagonal=0).bool()
+        mask = torch.tril(torch.ones(Q.shape[-2], K.shape[-2], device=Q.device), diagonal=0).bool()
 
         out = sdpa(Q, K, V, mask=mask)
 

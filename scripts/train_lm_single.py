@@ -31,7 +31,7 @@ def main(cfg: DictConfig):
     data_cfg: DictConfig = cfg.data
     training_cfg: DictConfig = cfg.training
 
-    wandb.init(project="train-llm-demo", name="train_single_sentence_special_token_v2")
+    wandb.init(project="train-llm", name="train_no_validation")
     print(isinstance(model_cfg, DictConfig))
     print("Model Configuration:")
     print("model_cfg", model_cfg)
@@ -53,6 +53,13 @@ def main(cfg: DictConfig):
 
     tokenizer = Tokenizer.from_files("data/TinyStories-train_vocab.json", "data/TinyStories-train_merges.txt", special_tokens=["<|endoftext|>"])
     data = load_data(data_cfg.data_path)
+    # scripts/train_lm_single.py
+    data = load_data(data_cfg.data_path)
+    print(f"Data dtype: {data.dtype}, Data shape: {data.shape}")
+    # 打印前 10 个 token
+    print(f"First 10 tokens: {data[:10].tolist()}") 
+    # 打印最大值
+    print(f"Max token in whole dataset (sample): {data[:20000].max()}")
     pbar = tqdm(range(0, training_cfg.train_steps), desc="Training", leave=False)
     
     save_interval = training_cfg.save_interval if 'save_interval' in training_cfg else 2000
@@ -72,9 +79,9 @@ def main(cfg: DictConfig):
         loss: Tensor = cross_entropy(logits, target)
 
         
-        if "<" in tokenizer.decode(target[0].tolist()):
-            print("input:", tokenizer.decode(input[0].tolist()))
-            print("target:", tokenizer.decode(target[0].tolist()))
+        # if "<" in tokenizer.decode(target[0].tolist()):
+        #     print("input:", tokenizer.decode(input[0].tolist()))
+        #     print("target:", tokenizer.decode(target[0].tolist()))
 
         optimizer.zero_grad()
         loss.backward()

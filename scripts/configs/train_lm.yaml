@@ -28,7 +28,7 @@ training:
   eval_interval: 500                  # 每500步评估，符合作业"定期验证损失"要求
   eval_iters: 100                     # 验证迭代数，平衡评估精度与耗时
   save_interval: 2000                 # 每2000步保存checkpoint，避免频繁写盘
-  checkpoint_path: "checkpoints/lm_checkpoint.pt"  # 作业要求的checkpoint保存路径
+  checkpoint_path: "checkpoints/lm_checkpoint"  # 作业要求的checkpoint保存路径,无需写后缀！
   grad_clip_norm: 1.0                 # 梯度裁剪经典值，作业要求实现该功能
   lr_max: 3e-4                        # 余弦调度的最大学习率，作业要求实现余弦退火
   warmup_steps: 1000                  # 预热步数为训练步的10%，避免初始学习率过大
