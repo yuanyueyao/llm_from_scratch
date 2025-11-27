@@ -14,6 +14,10 @@ class Tokenizer:
     special_tokens: Dict[str, bytes]  #  实例变量类型注释在这里
     next_token_id: int
     pat: re.Pattern[str]
+    
+    # 新增：反向索引
+    _vocab_inverse: Dict[bytes, int]
+    
     def __init__(self, vocab: Dict[int, bytes] | None, merges: List[Tuple[bytes, bytes]] | None, special_tokens: List[str] | None = None):
         """
         Construct a tokenizer from a given
@@ -26,6 +30,13 @@ class Tokenizer:
         
         self.next_token_id = max(vocab.keys()) + 1 if vocab else 0
         self.pat = re.compile(r"""'(?:[sdmt]|ll|ve|re)| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+""")
+        
+        # 构建反向索引：bytes -> token_id
+        self._build_inverse_vocab()
+
+    def _build_inverse_vocab(self):
+        """构建反向索引，用于快速查找 token_id"""
+        self._vocab_inverse = {v: k for k, v in self.vocab.items()}
 
     @classmethod
     def get_vocab_merges_from_path(
@@ -334,12 +345,8 @@ class Tokenizer:
             # If it's a special token, just add it directly
             if doc_or_special_token in self.special_tokens:
                 special_token_bytes = self.special_tokens[doc_or_special_token]
-                # Find token ID in vocab
-                token_id = None
-                for tid, vocab_token in self.vocab.items():
-                    if vocab_token == special_token_bytes:
-                        token_id = tid
-                        break
+                # 使用反向索引快速查找 token ID
+                token_id = self._vocab_inverse.get(special_token_bytes)
                 # if found in vocab, add to list
                 assert token_id is not None, f"Special token {doc_or_special_token} not found in vocabulary"
                 
@@ -369,24 +376,19 @@ class Tokenizer:
                             i += 1
                     current_tokens = new_tokens
                 
-                # Convert tokens to token IDs
+                # Convert tokens to token IDs - 使用反向索引
                 for token in current_tokens:
-                    # Find token ID in vocab
-                    token_id = None
-                    for tid, vocab_token in self.vocab.items():
-                        if vocab_token == token:
-                            token_id = tid
-                            break
+                    # 使用反向索引快速查找 token ID
+                    token_id = self._vocab_inverse.get(token)
                     
                     if token_id is not None:
                         all_token_ids.append(token_id)
                     else:
                         # Fallback: split into bytes
                         for byte in token:
-                            for tid, vocab_token in self.vocab.items():
-                                if vocab_token == bytes([byte]):
-                                    all_token_ids.append(tid)
-                                    break
+                            byte_token_id = self._vocab_inverse.get(bytes([byte]))
+                            if byte_token_id is not None:
+                                all_token_ids.append(byte_token_id)
             # Add special tokens found in the original text.just one per doc
             
 
@@ -400,8 +402,8 @@ class Tokenizer:
         Memory considerations. Suppose we want to tokenize a large text file that we cannot fit in memory.
         To eﬀiciently tokenize this large file (or any other stream of data), we need to break it up into manageable
         chunks and process each chunk in-turn, so that the memory complexity is constant as opposed to linear in
-        the size of the text. In doing so, we need to make sure that a token doesn’t cross chunk boundaries, else
-        we’ll get a different tokenization than the naïve method of tokenizing the entire sequence in-memory
+        the size of the text. In doing so, we need to make sure that a token doesn't cross chunk boundaries, else
+        we'll get a different tokenization than the naïve method of tokenizing the entire sequence in-memory
         """
         for line in iterable:
             token_ids = self.encode(line)

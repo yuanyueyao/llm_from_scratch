@@ -14,7 +14,7 @@ optimizer:
   eps: 1e-8
 
 data:
-  data_path: "data/TinyStories_yyy_small_tokens.bin"
+  data_path: "data/TinyStories_sample.bin"
   batch_size: 32
   context_length: 64
   device: "cpu"  # or "cuda"

@@ -46,3 +46,10 @@ Build a Large Language Model (LLM) completely from scratch! 😄
 - [ ] Evaluate the model's performance
 
 
+### Accelerate
+- [ ] tokenizer
+ - [ ] mutiprocess pretokenize
+ - [ ] lazy merge tokens
+
+
+最初没优化 merge 反向表的大概一秒处理1000token
