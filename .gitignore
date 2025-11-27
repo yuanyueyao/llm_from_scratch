@@ -4,7 +4,9 @@ data/
 .venv/
 venv/
 env/
-
+outputs/
+scripts/
+wandb/
 # Python cache and build files
 __pycache__/
 *.pyc
