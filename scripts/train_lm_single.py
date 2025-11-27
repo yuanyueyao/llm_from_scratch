@@ -48,7 +48,7 @@ def main(cfg: DictConfig):
     # for key, value in data_cfg.items():
     #     print(f"  {key}: {value}")
 
-    lm: Transformer_lm = Transformer_lm(**model_cfg)
+    lm: Transformer_lm = Transformer_lm(**model_cfg).to(data_cfg.device)
     optimizer: AdamW = AdamW(lm.parameters(), **optimizer_cfg)
 
     tokenizer = Tokenizer.from_files("data/TinyStories-train_vocab.json", "data/TinyStories-train_merges.txt", special_tokens=["<|endoftext|>"])
