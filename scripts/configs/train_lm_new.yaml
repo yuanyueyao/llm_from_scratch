@@ -1,33 +1,37 @@
+# 模型参数：严格遵循作业17M小模型要求+文档指定基础值
 model:
-  vocab_size: 10000
-  context_length: 128
-  d_model: 256
-  num_layers: 2
-  num_heads: 2
-  d_ff: 256
-  rope_theta: 10000
+  vocab_size: 10000          # 文档7.2节明确TinyStories的基础词汇量，要求调优
+  context_length: 256        # 文档7.2节指定的基础序列长度，要求调优
+  d_model: 256               # 维度选择适配17M参数量，为64的倍数（作业SwiGLU要求）
+  num_layers: 4              # 4层是小模型的经典层数，平衡效果与训练速度
+  num_heads: 4               # 注意力头数为d_model的约数（256/4=64），避免维度拆分错误
+  d_ff: 672                  # 严格遵循作业要求：8/3*d_model≈682，取64的倍数672
+  rope_theta: 10000          # RoPE经典默认值，文档无指定时的合理选择
 
+# 优化器参数：AdamW的经典配置，符合作业实现要求
 optimizer:
-  lr: 
-  weight_decay: 0.01
-  betas: [0.9, 0.95]
-  eps: 1e-8
+  lr: 0.0001                 # 初始学习率，作业要求做learning_rate实验调优
+  weight_decay: 0.01         # 权重衰减经典值，文档无反对则的默认选择
+  betas: [0.9, 0.95]         # AdamW的经典beta值，作业代码实现的常用配置
+  eps: 1e-8                  # 防止除零的极小值，优化器数值稳定性要求
 
+# 数据参数：适配TinyStories数据集，兼顾训练效率
 data:
-  data_path: "data/TinyStories_sample.bin"
-  batch_size: 32
-  context_length: 128
-  device: "cpu"  # or "cuda"
+  data_path: "data/TinyStories.bin"    # 完整TinyStories数据集路径（非sample）
+  batch_size: 64                      # 单卡H100的合理批次，作业要求做batch_size实验
+  context_length: 256                 # 与模型的context_length保持一致
+  device: "cuda"                      # 作业实验基于H100 GPU，优先用cuda
 
+# 训练参数：遵循作业日志/评估/调度要求，适配小模型训练
 training:
-  train_steps: 1000
-  eval_interval: 100
-  eval_iters: 200
-  save_interval: 2000
-  checkpoint_path: "checkpoints/lm_checkpoint.pt"
-  grad_clip_norm: 1.0
-  lr_max: 1e-3
-  warmup_steps: 500
-  lr_decay_steps: 8000
-  lr_min: 1e-5
-  cosine_iters: true
+  train_steps: 10000                  # 1万步适配小模型，兼顾收敛与训练速度
+  eval_interval: 500                  # 每500步评估，符合作业"定期验证损失"要求
+  eval_iters: 100                     # 验证迭代数，平衡评估精度与耗时
+  save_interval: 2000                 # 每2000步保存checkpoint，避免频繁写盘
+  checkpoint_path: "checkpoints/lm_checkpoint.pt"  # 作业要求的checkpoint保存路径
+  grad_clip_norm: 1.0                 # 梯度裁剪经典值，作业要求实现该功能
+  lr_max: 3e-4                        # 余弦调度的最大学习率，作业要求实现余弦退火
+  warmup_steps: 1000                  # 预热步数为训练步的10%，避免初始学习率过大
+  lr_decay_steps: 10000               # 衰减步数与训练步一致，全程余弦衰减
+  lr_min: 1e-5                        # 余弦调度的最小学习率，防止学习率降为0
+  cosine_iters: true                  # 作业明确要求实现余弦退火学习率调度
