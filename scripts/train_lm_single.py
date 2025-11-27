@@ -51,7 +51,7 @@ def main(cfg: DictConfig):
     lm: Transformer_lm = Transformer_lm(**model_cfg)
     optimizer: AdamW = AdamW(lm.parameters(), **optimizer_cfg)
 
-    tokenizer = Tokenizer.from_files("data/gpt2_vocab.json", "data/gpt2_merges.txt", special_tokens=["<|endoftext|>"])
+    tokenizer = Tokenizer.from_files("data/TinyStories-train_vocab.json", "data/TinyStories-train_merges.txt", special_tokens=["<|endoftext|>"])
     data = load_data(data_cfg.data_path)
     pbar = tqdm(range(0, training_cfg.train_steps), desc="Training", leave=False)
     

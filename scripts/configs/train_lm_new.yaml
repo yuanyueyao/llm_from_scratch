@@ -1,6 +1,6 @@
 model:
   vocab_size: 10000
-  context_length: 10000 # 64
+  context_length: 128
   d_model: 256
   num_layers: 2
   num_heads: 2
@@ -14,20 +14,20 @@ optimizer:
   eps: 1e-8
 
 data:
-  data_path: "data/TinyStories_single_special.bin"
+  data_path: "data/TinyStories_sample.bin"
   batch_size: 32
-  context_length: 64
+  context_length: 128
   device: "cpu"  # or "cuda"
 
 training:
   train_steps: 1000
   eval_interval: 100
   eval_iters: 200
-  save_interval: 100
-  checkpoint_path: "checkpoints/lm_checkpoint_single_special"
+  save_interval: 2000
+  checkpoint_path: "checkpoints/lm_checkpoint.pt"
   grad_clip_norm: 1.0
-  lr_max: 1e-2
-  warmup_steps: 50
-  lr_decay_steps: 800
-  lr_min: 1e-4
+  lr_max: 1e-3
+  warmup_steps: 500
+  lr_decay_steps: 8000
+  lr_min: 1e-5
   cosine_iters: true

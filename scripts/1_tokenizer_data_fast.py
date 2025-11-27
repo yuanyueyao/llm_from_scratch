@@ -23,8 +23,8 @@ tokenizer = FastTokenizer(
     special_tokens=["<|endoftext|>"]
 )
 
-input_file = "data/TinyStoriesV2-GPT4-train.txt"
-output_file = "data/TinyStoriesV2-GPT4-train-fast.bin"
+input_file = "data/TinyStoriesV2-GPT4-valid.txt"
+output_file = "data/TinyStoriesV2-GPT4-valid.bin"
 
 # 统计总行数（可选，用于显示进度条）
 print("Counting lines...")
