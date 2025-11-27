@@ -57,9 +57,17 @@ def main(cfg: DictConfig):
     
     save_interval = training_cfg.save_interval if 'save_interval' in training_cfg else 2000
 
+
     for step in pbar:
         input, target = get_batch(data, data_cfg.batch_size, data_cfg.context_length, data_cfg.device)
         
+        # --- 添加以下代码进行调试 ---
+        max_token_id = input.max().item()
+        if max_token_id >= model_cfg.vocab_size:
+            print(f"!!! Error Check: Max token ID in batch is {max_token_id}, but vocab_size is {model_cfg.vocab_size}.")
+            # 此时应该直接退出或报错，因为已经确认索引越界
+        # --- 调试代码结束 ---
+
         logits: Tensor = lm(input)
         loss: Tensor = cross_entropy(logits, target)
 
